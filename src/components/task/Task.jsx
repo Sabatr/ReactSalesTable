@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import {Card, CardContent, Typography} from "@material-ui/core";
 
 import ExchangeRateCard from "./ExchangeRateCard";
-import ExampleTable from "./ExampleTable";
+import SalesTable from "./SalesTable";
 
 
 // import data from "../../data";
@@ -19,6 +19,7 @@ class Task extends Component {
             USD: null,
             AUD: null,
         },
+        data: null
     };
 
     componentDidMount() {
@@ -51,9 +52,10 @@ class Task extends Component {
                         </Typography>
                     </CardContent>
                 </Card>
+               
                 <ExchangeRateCard rates={this.state.rates} base={this.state.base} />
                 { /* Replace this example table with your solution below. */}
-                <ExampleTable />
+                <SalesTable/>
             </div>
         );
     }
