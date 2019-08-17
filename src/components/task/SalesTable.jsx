@@ -5,9 +5,12 @@ import {
     TableRow,
     TableBody,
     TableHead,
-
+    IconButton,
     Card, CardContent, Typography
 } from "@material-ui/core";
+import OptionsMenu from './table_options/OptionsMenu'
+
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 /**
  * An implementation of a sales table using ReactJS and Material-UI
@@ -21,45 +24,71 @@ import {
  * 
  * @author Brian Nguyen
  */
+
 class SalesTable extends React.Component {
-    state = {
-        data: []
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            data: [],
+            anchor: null,
+            isOpen: false
+        }
+        this.handleOptionsClick = this.handleOptionsClick.bind(this);
+        this.handleMenuClose = this.handleMenuClose.bind(this);
+        this.handleTableUpdate = this.handleTableUpdate.bind(this);
     }
+
+    
 
     componentDidMount() {
         fetch("http://www.mocky.io/v2/5d4caeb23100000a02a95477")
-        .then(response => response.json())
-        .then(response => this.setState({ data : response }));
+            .then(response => response.json())
+            .then(response => this.setState({ data: response }));
     }
 
     render() {
         return (
             <Card>
-            <CardContent>
-                <Typography></Typography>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            {this.createHeadings().map((value,i) => 
-                                <TableCell key={`heading_${i}`}>
-                                    <div>{value}</div>
-                                </TableCell>)}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                    {
-                    this.getData().map((data,i) =>
-                        <TableRow key={`row_${i}`}>
-                                {Object.values(data).map((tableData,inc) => 
-                                <TableCell key={`cell_${inc}`}>
-                                    <div>{`${tableData}`}</div>
-                                </TableCell>)}
-                        </TableRow>)
-                    }
-                    </TableBody>
-                </Table>
-            </CardContent>
-        </Card>
+                <CardContent>
+                    <Typography></Typography>
+                    <IconButton
+                                        aria-label="more"
+                                        aria-haspopup="true"
+                                        onClick={this.handleOptionsClick}
+                                    >
+                                        <MoreVertIcon />
+                                    </IconButton>
+                                    <OptionsMenu 
+                                        anchor={this.state.anchor} 
+                                        onClose={this.handleMenuClose} 
+                                        isOpen={this.state.isOpen}
+                                        data={this.state.data}
+                                        updateData={this.handleTableUpdate}
+                                    />
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                {this.createHeadings().map((value, i) =>
+                                    <TableCell key={`heading_${i}`}>
+                                        {value}
+                                    </TableCell>)}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {
+                                this.getData().map((data, i) =>
+                                    <TableRow key={`row_${i}`}>
+                                        {Object.values(data).map((tableData, inc) =>
+                                            <TableCell key={`cell_${inc}`}>
+                                                <div>{`${tableData}`}</div>
+                                            </TableCell>)}
+                                    </TableRow>)
+                            }
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         );
     }
 
@@ -86,6 +115,27 @@ class SalesTable extends React.Component {
     getData() {
         let data = this.state.data.length === 0 ? ["loading..."] : Object.values(this.state.data);
         return data;
+    }
+
+
+
+    handleOptionsClick(event) {
+        this.setState({
+            anchor: event.currentTarget,
+            isOpen: true
+        })
+    }
+
+    handleMenuClose() {
+        this.setState({
+            isOpen: false,
+        })
+    }
+
+    handleTableUpdate(newData) {
+        this.setState({
+            data: newData
+        })
     }
 }
 
