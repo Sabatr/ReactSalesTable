@@ -8,7 +8,7 @@ import {
     IconButton,
     Card, CardContent, Typography
 } from "@material-ui/core";
-import OptionsMenu from './table_options/OptionsMenu'
+import FilterMenu from './table_options/FilterMenu'
 
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
@@ -39,7 +39,7 @@ class SalesTable extends React.Component {
         this.handleTableUpdate = this.handleTableUpdate.bind(this);
     }
 
-    
+
 
     componentDidMount() {
         fetch("http://www.mocky.io/v2/5d4caeb23100000a02a95477")
@@ -53,19 +53,19 @@ class SalesTable extends React.Component {
                 <CardContent>
                     <Typography></Typography>
                     <IconButton
-                                        aria-label="more"
-                                        aria-haspopup="true"
-                                        onClick={this.handleOptionsClick}
-                                    >
-                                        <MoreVertIcon />
-                                    </IconButton>
-                                    <OptionsMenu 
-                                        anchor={this.state.anchor} 
-                                        onClose={this.handleMenuClose} 
-                                        isOpen={this.state.isOpen}
-                                        data={this.state.data}
-                                        updateData={this.handleTableUpdate}
-                                    />
+                        aria-label="more"
+                        aria-haspopup="true"
+                        onClick={this.handleOptionsClick}
+                    >
+                        <MoreVertIcon />
+                    </IconButton>
+                    <FilterMenu
+                        anchor={this.state.anchor}
+                        onClose={this.handleMenuClose}
+                        isOpen={this.state.isOpen}
+                        data={this.state.data}
+                        updateData={this.handleTableUpdate}
+                    />
                     <Table>
                         <TableHead>
                             <TableRow>
@@ -118,7 +118,9 @@ class SalesTable extends React.Component {
     }
 
 
-
+    /**
+     * Displays the filter menu when clicked
+     */
     handleOptionsClick(event) {
         this.setState({
             anchor: event.currentTarget,
@@ -126,12 +128,18 @@ class SalesTable extends React.Component {
         })
     }
 
+    /**
+     * Closes the menu 
+     */
     handleMenuClose() {
         this.setState({
             isOpen: false,
         })
     }
 
+    /**
+     * Updates the table depending on the data made by the filter menu
+     */
     handleTableUpdate(newData) {
         this.setState({
             data: newData

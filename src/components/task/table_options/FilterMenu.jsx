@@ -12,7 +12,7 @@ import {
  * 
  * @author Brian Nguyen
  */
-class OptionsMenu extends React.Component {
+class FilterMenu extends React.Component {
     constructor(props) {
         super(props);
 
@@ -63,4 +63,4 @@ class OptionsMenu extends React.Component {
     }
 }
 
-export default OptionsMenu;
+export default FilterMenu;
