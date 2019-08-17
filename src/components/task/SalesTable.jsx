@@ -5,12 +5,14 @@ import {
     TableRow,
     TableBody,
     TableHead,
+    TextField,
     IconButton,
     Card, CardContent, Typography
 } from "@material-ui/core";
 import FilterMenu from './table_options/FilterMenu'
 
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import SearchField from "./SearchField";
 
 /**
  * An implementation of a sales table using ReactJS and Material-UI
@@ -30,13 +32,19 @@ class SalesTable extends React.Component {
         super(props);
 
         this.state = {
+            originalData: [],
             data: [],
             anchor: null,
-            isOpen: false
+            isOpen: false,
+            text: "",
+            showReturn: false,
+            currency: "(NZD)"
         }
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
         this.handleMenuClose = this.handleMenuClose.bind(this);
         this.handleTableUpdate = this.handleTableUpdate.bind(this);
+        this.handleFieldChange = this.handleFieldChange.bind(this);
+        this.handleReturnedOption = this.handleReturnedOption.bind(this);
     }
 
 
@@ -44,7 +52,7 @@ class SalesTable extends React.Component {
     componentDidMount() {
         fetch("http://www.mocky.io/v2/5d4caeb23100000a02a95477")
             .then(response => response.json())
-            .then(response => this.setState({ data: response }));
+            .then(response => this.setState({ originalData: response, data:response }));
     }
 
     render() {
@@ -59,19 +67,33 @@ class SalesTable extends React.Component {
                     >
                         <MoreVertIcon />
                     </IconButton>
+                    <SearchField 
+                        data={this.state.data} 
+                        originalData={this.state.originalData} 
+                        updateTable={this.handleTableUpdate}
+                        handleChange={this.handleFieldChange}
+                        text={this.state.text}
+                        showReturned={this.state.showReturn}/>
                     <FilterMenu
                         anchor={this.state.anchor}
                         onClose={this.handleMenuClose}
                         isOpen={this.state.isOpen}
-                        data={this.state.data}
+                        data={this.state.originalData}
                         updateData={this.handleTableUpdate}
+                        handleReturned={this.handleReturnedOption}
+                        text={this.state.text}
+                        checked={this.state.showReturn}
+
                     />
                     <Table>
                         <TableHead>
                             <TableRow>
                                 {this.createHeadings().map((value, i) =>
                                     <TableCell key={`heading_${i}`}>
-                                        {value}
+                                        {
+                                            (value==="Value") ? `${value} ${this.state.currency}` : value
+                                            
+                                        }
                                     </TableCell>)}
                             </TableRow>
                         </TableHead>
@@ -96,7 +118,7 @@ class SalesTable extends React.Component {
      * This function grabs the headings from json after it has loaded.
      */
     createHeadings() {
-        let headings = this.state.data.length === 0 ? ["loading..."] : Object.keys(this.state.data[0]);
+        let headings = this.state.originalData.length === 0 ? ["loading..."] : Object.keys(this.state.originalData[0]);
         // I wanted to capitalise the headings because it looks nicer
         let capitalisedHeadings = headings.map(heading => this.capitaliseFirstLetter(heading))
         return capitalisedHeadings;
@@ -113,7 +135,16 @@ class SalesTable extends React.Component {
      * This function grabs the data from the json after it has loaded.
      */
     getData() {
-        let data = this.state.data.length === 0 ? ["loading..."] : Object.values(this.state.data);
+        let data;
+        if (this.state.originalData.length === 0) {
+            data = ["Nothing found"];
+        } else {
+            if (this.state.data.length === 0) {
+                data = Object.values(this.state.originalData);
+            } else {
+                data = Object.values(this.state.data);
+            }
+        }
         return data;
     }
 
@@ -137,6 +168,17 @@ class SalesTable extends React.Component {
         })
     }
 
+    handleFieldChange(value) {
+        this.setState({
+            text: value
+        })
+    }
+
+    handleReturnedOption() {
+        this.setState({
+            showReturn: !this.state.showReturn
+        })
+    }
     /**
      * Updates the table depending on the data made by the filter menu
      */
@@ -145,6 +187,7 @@ class SalesTable extends React.Component {
             data: newData
         })
     }
+
 }
 
 export default SalesTable;

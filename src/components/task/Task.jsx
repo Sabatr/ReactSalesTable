@@ -55,7 +55,7 @@ class Task extends Component {
                
                 <ExchangeRateCard rates={this.state.rates} base={this.state.base} />
                 { /* Replace this example table with your solution below. */}
-                <SalesTable/>
+                <SalesTable rates={this.state.rates}/>
             </div>
         );
     }

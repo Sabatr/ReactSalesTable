@@ -38,8 +38,10 @@ class FilterMenu extends React.Component {
                 }}
             >
                 <MenuItem id="returned-menu-item" onClick={this.handleReturnedCheckChange}  >
-                    <Checkbox checked={this.state.checked} />
+                    <Checkbox checked={this.props.checked} />
                     <Typography>Show returned only.</Typography>
+                </MenuItem>
+                <MenuItem id="returned-menu-item" onClick={this.handleReturnedCheckChange}  >
                 </MenuItem>
             </Menu>
         )
@@ -49,15 +51,16 @@ class FilterMenu extends React.Component {
      * Changes the data to be inputted, depending on the check
      */
     handleReturnedCheckChange() {
-        this.setState({
-            checked: !this.state.checked,
-            originalData: this.props.data
-        })
+        this.props.handleReturned();
         let newData;
-        if (!this.state.checked) {
+        if (!this.props.checked) {
             newData = this.props.data.filter(x => x.returned === false);
         } else {
-            newData = this.state.originalData;
+            newData = this.props.data;
+        }
+
+        if (this.props.text.length > 0) {
+            newData = newData.filter(x =>Object.values(x).map(y => y.toString().toLowerCase()).includes(this.props.text));
         }
         this.props.updateData(newData);
     }
