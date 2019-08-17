@@ -21,7 +21,6 @@ class SalesTable extends React.Component {
     }
 
     render() {
-      //  this.createHeadings();
         return (
             <Card>
             <CardContent>
@@ -34,6 +33,16 @@ class SalesTable extends React.Component {
                     </TableHead>
     
                     <TableBody>
+                    {
+                    this.getData().map((data,i) =>
+                        <TableRow key={`row_${i}`}>
+                                {Object.values(data).map((tableData,inc) => 
+                                <TableCell key={`cell_${inc}`}>
+                                    {console.log(inc + "and" + tableData)}
+                                    <div>{`${tableData}`}</div>
+                                </TableCell>)}
+                        </TableRow>)
+                    }
                     {/*
                         exampleData.map((data, ind) => <TableRow key={`exampleRow_${ind}`}>
                             {Object.values(data).map((d, i) => <TableCell key={`exampleCell_${i}`}>{d}</TableCell>)}
@@ -52,6 +61,11 @@ class SalesTable extends React.Component {
     createHeadings() {
         let headings = this.state.data.length === 0 ? ["loading..."] : Object.keys(this.state.data[0]);
         return headings;
+    }
+
+    getData() {
+        let data = this.state.data.length === 0 ? ["loading..."] : Object.values(this.state.data);
+        return data;
     }
 }
 
