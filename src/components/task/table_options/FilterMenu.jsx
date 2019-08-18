@@ -48,10 +48,10 @@ class FilterMenu extends React.Component {
                         native={true}
                         value={this.props.currency}
                         onChange={this.handleSelectChange}
-                    >   
+                    >
                         <option>All</option>
                         <option>NZD</option>
-                        {Object.keys(this.props.rates).map((x,i)=> <option key={`Option_${i}`}>{x}</option>)}
+                        {Object.keys(this.props.rates).map((x, i) => <option key={`Option_${i}`}>{x}</option>)}
                     </Select>
                 </MenuItem>
             </Menu>
@@ -61,61 +61,94 @@ class FilterMenu extends React.Component {
     handleSelectChange(event) {
         this.props.currencyHandler(event.target.value);
         let copy = this.makeCopy(this.props.data)
-        copy.forEach((x,i) => x.value =this.applyConversion(x.value,event.target.value,x.country,i,x))
+        copy.forEach((x, i) => x.value = this.applyConversion(event.target.value, x))
         this.props.updateData(copy);
-        
+
 
 
     }
-
-    applyConversion(value, currency, country,index,data) {
-        let convert = 1;
+    applyConversion(currency, data) {
         let currencies = Object.keys(this.props.rates);
-        currencies.push("All","NZD");
-        switch(currency) {
+        currencies.push("All", "NZD");
+        let convert = 1;
+        let original = this.props.originalData.find(x => x.id === data.id).value;
+        let country = data.country;
+        switch (currency) {
             case "AUD":
                 if (country === "NZL") {
-                    convert = 1/this.props.rates.AUD;
+                    convert = 1 / this.props.rates.AUD;
                 } else if (country === "USA") {
-                    convert = this.props.rates.USD/this.props.rates.AUD;
-                } else {
-                    let original =  this.props.originalData.find(x=> x.id === data.id);
-                    value = original.value;
+                    convert = this.props.rates.USD / this.props.rates.AUD;
                 }
                 break;
             case "USD":
                 if (country === "NZL") {
-                    convert = 1/this.props.rates.USD;
+                    convert = 1 / this.props.rates.USD;
                 } else if (country === "AUS") {
-                    convert = this.props.rates.AUD/this.props.rates.USA
-                } else {
-                    //JSON.parse(JSON.stringify(data)) === JSON.parse(JSON.stringify(x))
-                    let original =  this.props.originalData.find(x=> x.id === data.id);
-                    value = original.value;
-                   // value = this.props.originalData.find(x => JSON.parse  (JSON.stringify(x)))===JSON.parse(JSON.stringify(data));
-                    
+                    convert = this.props.rates.AUD / this.props.rates.USA;
                 }
                 break;
             case "NZD":
                 if (country === "AUS") {
-                    convert = this.props.rates.AUD
+                    convert = this.props.rates.AUD;
                 } else if (country === "USA") {
-                    convert = this.props.rates.USD
-                } else {
-                    let original =  this.props.originalData.find(x=> x.id === data.id);
-                    value = original.value;
+                    convert = this.props.rates.USD;
                 }
                 break;
             default:
-            let original =  this.props.originalData.find(x=> x.id === data.id);
-            value = original.value;
-                convert = 1;
                 break;
         }
-        let returnedValue = (convert === 1) ?  value : Math.round(value/convert * 100)/100;
+        let returnedValue = (convert === 1) ?  original : Math.round(original/convert * 100)/100;
         return returnedValue;
     }
-    
+    // applyConversion(value, currency, country,index,data) {
+    //     let convert = 1;
+    //     let currencies = Object.keys(this.props.rates);
+    //     currencies.push("All","NZD");
+    //     switch(currency) {
+    //         case "AUD":
+    //             if (country === "NZL") {
+    //                 convert = 1/this.props.rates.AUD;
+    //             } else if (country === "USA") {
+    //                 convert = this.props.rates.USD/this.props.rates.AUD;
+    //             } else {
+    //                 let original =  this.props.originalData.find(x=> x.id === data.id);
+    //                 value = original.value;
+    //             }
+    //             break;
+    //         case "USD":
+    //             if (country === "NZL") {
+    //                 convert = 1/this.props.rates.USD;
+    //             } else if (country === "AUS") {
+    //                 convert = this.props.rates.AUD/this.props.rates.USA
+    //             } else {
+    //                 //JSON.parse(JSON.stringify(data)) === JSON.parse(JSON.stringify(x))
+    //                 let original =  this.props.originalData.find(x=> x.id === data.id);
+    //                 value = original.value;
+    //                // value = this.props.originalData.find(x => JSON.parse  (JSON.stringify(x)))===JSON.parse(JSON.stringify(data));
+
+    //             }
+    //             break;
+    //         case "NZD":
+    //             if (country === "AUS") {
+    //                 convert = this.props.rates.AUD
+    //             } else if (country === "USA") {
+    //                 convert = this.props.rates.USD
+    //             } else {
+    //                 let original =  this.props.originalData.find(x=> x.id === data.id);
+    //                 value = original.value;
+    //             }
+    //             break;
+    //         default:
+    //         let original =  this.props.originalData.find(x=> x.id === data.id);
+    //         value = original.value;
+    //             convert = 1;
+    //             break;
+    //     }
+    //     let returnedValue = (convert === 1) ?  value : Math.round(value/convert * 100)/100;
+    //     return returnedValue;
+    // }
+
 
     /**
      * Changes the data to be inputted, depending on the check
@@ -137,7 +170,7 @@ class FilterMenu extends React.Component {
 
     makeCopy(array) {
         let copy = [...array]
-        let copyInside = copy.map((x,i) => x = JSON.parse(JSON.stringify(x)))
+        let copyInside = copy.map((x, i) => x = JSON.parse(JSON.stringify(x)))
         return copyInside
     }
 }

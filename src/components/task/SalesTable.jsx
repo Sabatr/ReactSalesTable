@@ -5,7 +5,6 @@ import {
     TableRow,
     TableBody,
     TableHead,
-    TextField,
     IconButton,
     Card, CardContent, Typography, TableSortLabel
 } from "@material-ui/core";
@@ -166,7 +165,6 @@ class SalesTable extends React.Component {
         if (this.state.sort === 'desc') {
             this.state.data.reverse()
         } 
-       // test.forEach( x => x.sortBy)
     }
 
     
