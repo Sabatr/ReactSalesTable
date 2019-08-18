@@ -45,6 +45,7 @@ class SalesTable extends React.Component {
         this.handleTableUpdate = this.handleTableUpdate.bind(this);
         this.handleFieldChange = this.handleFieldChange.bind(this);
         this.handleReturnedOption = this.handleReturnedOption.bind(this);
+        this.makeCopy = this.makeCopy.bind(this);
     }
 
 
@@ -52,7 +53,8 @@ class SalesTable extends React.Component {
     componentDidMount() {
         fetch("http://www.mocky.io/v2/5d4caeb23100000a02a95477")
             .then(response => response.json())
-            .then(response => this.setState({ originalData: response, data:response }));
+            .then(response => this.setState({data:response }))
+            .then(this.makeCopy);
     }
 
     render() {
@@ -78,11 +80,13 @@ class SalesTable extends React.Component {
                         anchor={this.state.anchor}
                         onClose={this.handleMenuClose}
                         isOpen={this.state.isOpen}
-                        data={this.state.originalData}
+                        originalData={this.state.originalData} 
+                        data={this.state.data}
                         updateData={this.handleTableUpdate}
                         handleReturned={this.handleReturnedOption}
                         text={this.state.text}
                         checked={this.state.showReturn}
+                        rates={this.props.rates}
 
                     />
                     <Table>
@@ -90,10 +94,7 @@ class SalesTable extends React.Component {
                             <TableRow>
                                 {this.createHeadings().map((value, i) =>
                                     <TableCell key={`heading_${i}`}>
-                                        {
-                                            (value==="Value") ? `${value} ${this.state.currency}` : value
-                                            
-                                        }
+                                        { value }
                                     </TableCell>)}
                             </TableRow>
                         </TableHead>
@@ -103,7 +104,10 @@ class SalesTable extends React.Component {
                                     <TableRow key={`row_${i}`}>
                                         {Object.values(data).map((tableData, inc) =>
                                             <TableCell key={`cell_${inc}`}>
-                                                <div>{`${tableData}`}</div>
+                                                <div>
+                                                {
+                                                    (inc === 3) ? `${tableData} ${this.getCurrency(data.country)}`: `${tableData}`}
+                                                </div>
                                             </TableCell>)}
                                     </TableRow>)
                             }
@@ -112,6 +116,17 @@ class SalesTable extends React.Component {
                 </CardContent>
             </Card>
         );
+    }
+
+    makeCopy() {
+        
+        if ( this.state.data.length !== 0) {
+            let data = [...this.state.data]
+            let copy = data.map((x,i) => x = JSON.parse(JSON.stringify(x)))
+            this.setState({
+                originalData: copy
+            })
+        }
     }
 
     /**
@@ -146,6 +161,19 @@ class SalesTable extends React.Component {
             }
         }
         return data;
+    }
+
+    getCurrency(country) {
+        switch(country) {
+            case "USA":
+                return "USD";
+            case "NZL":
+                return "NZD";
+            case "AUS":
+                return "AUD";
+            default:
+                return "";
+        }
     }
 
 
