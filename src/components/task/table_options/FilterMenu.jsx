@@ -46,7 +46,7 @@ class FilterMenu extends React.Component {
                 <MenuItem >
                     <Select
                         native={true}
-                        value={this.state.currency}
+                        value={this.props.currency}
                         onChange={this.handleSelectChange}
                     >   
                         <option>All</option>
@@ -59,16 +59,16 @@ class FilterMenu extends React.Component {
     }
 
     handleSelectChange(event) {
+        this.props.currencyHandler(event.target.value);
         let copy = this.makeCopy(this.props.data)
-        copy.forEach((x,i) => x.value =this.applyConversion(x.value,event.target.value,x.country,i))
-        this.props.updateData(copy)
+        copy.forEach((x,i) => x.value =this.applyConversion(x.value,event.target.value,x.country,i,x))
+        this.props.updateData(copy);
+        
 
-        this.setState({
-            value: event.target.value
-        })
+
     }
 
-    applyConversion(value, currency, country,index) {
+    applyConversion(value, currency, country,index,data) {
         let convert = 1;
         let currencies = Object.keys(this.props.rates);
         currencies.push("All","NZD");
@@ -77,21 +77,23 @@ class FilterMenu extends React.Component {
                 if (country === "NZL") {
                     convert = 1/this.props.rates.AUD;
                 } else if (country === "USA") {
-                    convert = this.props.rates.AUD/this.props.rates.USD;
+                    convert = this.props.rates.USD/this.props.rates.AUD;
                 } else {
-                    value = this.props.originalData[index].value;
-                    
+                    let original =  this.props.originalData.find(x=> x.id === data.id);
+                    value = original.value;
                 }
                 break;
             case "USD":
                 if (country === "NZL") {
                     convert = 1/this.props.rates.USD;
                 } else if (country === "AUS") {
-                    convert = this.props.rates.USD/this.props.rates.AUD
+                    convert = this.props.rates.AUD/this.props.rates.USA
                 } else {
-                    value = this.props.originalData[index].value;
-                  //  console.log(this.props.originalData)
-                  //  console.log(this.props.data)
+                    //JSON.parse(JSON.stringify(data)) === JSON.parse(JSON.stringify(x))
+                    let original =  this.props.originalData.find(x=> x.id === data.id);
+                    value = original.value;
+                   // value = this.props.originalData.find(x => JSON.parse  (JSON.stringify(x)))===JSON.parse(JSON.stringify(data));
+                    
                 }
                 break;
             case "NZD":
@@ -100,10 +102,13 @@ class FilterMenu extends React.Component {
                 } else if (country === "USA") {
                     convert = this.props.rates.USD
                 } else {
-                    value = this.props.originalData[index].value;
+                    let original =  this.props.originalData.find(x=> x.id === data.id);
+                    value = original.value;
                 }
                 break;
             default:
+            let original =  this.props.originalData.find(x=> x.id === data.id);
+            value = original.value;
                 convert = 1;
                 break;
         }

@@ -7,7 +7,7 @@ import {
     TableHead,
     TextField,
     IconButton,
-    Card, CardContent, Typography
+    Card, CardContent, Typography, TableSortLabel
 } from "@material-ui/core";
 import FilterMenu from './table_options/FilterMenu'
 
@@ -38,7 +38,8 @@ class SalesTable extends React.Component {
             isOpen: false,
             text: "",
             showReturn: false,
-            currency: "(NZD)"
+            sort: 'desc',
+            currency: "All"
         }
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
         this.handleMenuClose = this.handleMenuClose.bind(this);
@@ -46,6 +47,8 @@ class SalesTable extends React.Component {
         this.handleFieldChange = this.handleFieldChange.bind(this);
         this.handleReturnedOption = this.handleReturnedOption.bind(this);
         this.makeCopy = this.makeCopy.bind(this);
+        this.handleCurrency = this.handleCurrency.bind(this);
+        this.handleSortClick = this.handleSortClick.bind(this);
     }
 
 
@@ -87,6 +90,8 @@ class SalesTable extends React.Component {
                         text={this.state.text}
                         checked={this.state.showReturn}
                         rates={this.props.rates}
+                        currencyHandler={this.handleCurrency}
+                        currency={this.state.currency}
 
                     />
                     <Table>
@@ -94,7 +99,12 @@ class SalesTable extends React.Component {
                             <TableRow>
                                 {this.createHeadings().map((value, i) =>
                                     <TableCell key={`heading_${i}`}>
+                                        <TableSortLabel
+                                            direction={this.state.sort}
+                                            onClick={() => this.handleSortClick(value)}
+                                        >
                                         { value }
+                                        </TableSortLabel>
                                     </TableCell>)}
                             </TableRow>
                         </TableHead>
@@ -146,6 +156,22 @@ class SalesTable extends React.Component {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
 
+    handleSortClick(sortBy) {
+        this.setState({
+            sort: (this.state.sort === 'asc') ? 'desc' : 'asc'
+        })
+        this.state.data.sort((x,y) => (typeof x[sortBy.toLowerCase()] === 'string') ?
+                `${x[sortBy.toLowerCase()]}`.localeCompare(`${y[sortBy.toLowerCase()]}`)
+            :     x[sortBy.toLowerCase()] - y[sortBy.toLowerCase()])
+        if (this.state.sort === 'desc') {
+            this.state.data.reverse()
+        } 
+       // test.forEach( x => x.sortBy)
+    }
+
+    
+
+
     /**
      * This function grabs the data from the json after it has loaded.
      */
@@ -164,16 +190,28 @@ class SalesTable extends React.Component {
     }
 
     getCurrency(country) {
-        switch(country) {
-            case "USA":
+        switch (this.state.currency) {
+            case "All":
+                switch(country) {
+                    case "USA":
+                        return "USD";
+                    case "NZL":
+                        return "NZD";
+                    case "AUS":
+                        return "AUD";
+                    default:
+                        return "";
+                }
+            case "USD":
                 return "USD";
-            case "NZL":
+            case "NZD":
                 return "NZD";
-            case "AUS":
+            case "AUD":
                 return "AUD";
             default:
                 return "";
-        }
+        } 
+
     }
 
 
@@ -205,6 +243,12 @@ class SalesTable extends React.Component {
     handleReturnedOption() {
         this.setState({
             showReturn: !this.state.showReturn
+        })
+    }
+
+    handleCurrency(value) {
+        this.setState({
+            currency: value
         })
     }
     /**
