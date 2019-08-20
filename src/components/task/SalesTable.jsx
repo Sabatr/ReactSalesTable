@@ -7,7 +7,11 @@ import {
     TableHead,
     TablePagination,
     IconButton,
-    Card, CardContent, Typography, TableSortLabel, TableFooter
+    Card,
+    CardHeader,
+    CardContent,
+    Tooltip,
+    TableSortLabel, TableFooter
 } from "@material-ui/core";
 import importedData from '../data/data.js'
 import FilterMenu from './table_options/FilterMenu'
@@ -31,7 +35,6 @@ import SearchField from "./SearchField";
 class SalesTable extends React.Component {
     constructor(props) {
         super(props);
-
         this.state = {
             originalData: [],
             data: [],
@@ -58,53 +61,65 @@ class SalesTable extends React.Component {
         this.getFooter = this.getFooter.bind(this);
     }
 
-
     componentDidMount() {
         // fetch("http://www.mocky.io/v2/5d4caeb23100000a02a95477")
         //     .then(response => response.json())
         //     .then(response => this.setState({ data: response }))
         //     .then(this.makeCopy);
-        console.log(importedData)
+
+        // If I have no internet
         this.setState({
             data: importedData,
             originalData: importedData
         })
-        //  console.log(data)
     }
 
     render() {
         return (
             <Card>
-                <CardContent>
-                    <Typography></Typography>
-                    <IconButton
-                        aria-label="more"
-                        aria-haspopup="true"
-                        onClick={this.handleOptionsClick}
-                    >
-                        <MoreVertIcon />
-                    </IconButton>
-                    <SearchField
-                        data={this.state.data}
-                        originalData={this.state.originalData}
-                        updateTable={this.handleTableUpdate}
-                        handleChange={this.handleFieldChange}
-                        text={this.state.text}
-                        showReturned={this.state.showReturn} />
-                    <FilterMenu
-                        anchor={this.state.anchor}
-                        onClose={this.handleMenuClose}
-                        isOpen={this.state.isOpen}
-                        originalData={this.state.originalData}
-                        data={this.state.data}
-                        updateData={this.handleTableUpdate}
-                        handleReturned={this.handleReturnedOption}
-                        text={this.state.text}
-                        checked={this.state.showReturn}
-                        rates={this.props.rates}
-                        currencyHandler={this.handleCurrency}
-                        currency={this.state.currency}
+                <CardHeader
+                    style={{backgroundColor: 'lightblue'}}
+                    action={
+                        <div>
+                            <SearchField
+                                data={this.state.data}
+                                originalData={this.state.originalData}
+                                updateTable={this.handleTableUpdate}
+                                handleChange={this.handleFieldChange}
+                                text={this.state.text}
+                                showReturned={this.state.showReturn}
+                                changePage={this.handleChangePage} />
+                            <FilterMenu
+                                anchor={this.state.anchor}
+                                onClose={this.handleMenuClose}
+                                isOpen={this.state.isOpen}
+                                originalData={this.state.originalData}
+                                data={this.state.data}
+                                updateData={this.handleTableUpdate}
+                                handleReturned={this.handleReturnedOption}
+                                text={this.state.text}
+                                checked={this.state.showReturn}
+                                rates={this.props.rates}
+                                currencyHandler={this.handleCurrency}
+                                currency={this.state.currency}
+                                changePage={this.handleChangePage}
+                            />
+                            <Tooltip title="Settings">
+                            <IconButton
+                                aria-label="more"
+                                aria-haspopup="true"
+                                style={{ float: 'right' }}
+                                onClick={this.handleOptionsClick}
+                            >
+                                <MoreVertIcon />
+                            </IconButton>
+                            </Tooltip>
+
+                        </div>
+                    }
+                    title="Sales Table"
                     />
+                <CardContent>
                     <Table>
                         <TableHead>
                             <TableRow>
@@ -129,25 +144,27 @@ class SalesTable extends React.Component {
                                                 <TableCell key={`cell_${inc}`}>
                                                     <div>
                                                         {
-                                                            (inc === 3) ? `${tableData} ${this.getCurrency(data.country)}` : `${tableData}`}
+                                                            // If in the value column, add the currency label to it.
+                                                            (inc === 3) ? `${tableData} ${this.getCurrency(data.country)}` : `${tableData}`
+                                                        }
                                                     </div>
                                                 </TableCell>)}
 
                                         </TableRow>)
                             }
                             {
+                                // If there are rows that aren't filled, fill it with an empty row
                                 this.getEmptyRows() > 0 && (
                                     <TableRow style={{ height: 48 * this.getEmptyRows() }}>
                                         <TableCell colSpan={6} />
                                     </TableRow>
                                 )
-
                             }
                         </TableBody>
                         <TableFooter>
                             <TableRow>
                                 <TablePagination
-                                    rowsPerPageOptions={[5, 10, 15,20,25]}
+                                    rowsPerPageOptions={[5, 10, 15, 20, 25]}
                                     colSpan={6}
                                     count={this.state.data.length}
                                     rowsPerPage={this.state.rowsPerPage}
@@ -168,11 +185,13 @@ class SalesTable extends React.Component {
             </Card>
         );
     }
-
+    /**
+     * Creates the actions footer for the table
+     */
     getFooter() {
         return (
-            <FooterActions 
-                page={this.state.page} 
+            <FooterActions
+                page={this.state.page}
                 pageChange={this.handleChangePage}
                 count={this.state.data.length}
                 rowsPerPage={this.state.rowsPerPage}
@@ -180,8 +199,12 @@ class SalesTable extends React.Component {
         )
     }
 
+    /**
+     *  Retrieves the number of rows that cannot be filled
+     */
     getEmptyRows() {
-        let emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage, this.state.data.length - this.state.page * this.state.rowsPerPage);
+        let emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage,
+            this.state.data.length - this.state.page * this.state.rowsPerPage);
         return emptyRows;
     }
 
@@ -193,10 +216,11 @@ class SalesTable extends React.Component {
 
     handleChangeRowsPerPage(event) {
         this.setState({
-            rowsPerPage: event.target.value
+            rowsPerPage: parseInt(event.target.value)
         })
     }
 
+    // Makes a completely different reference of the same object
     makeCopy() {
         if (this.state.data.length !== 0) {
             let data = [...this.state.data]
@@ -236,9 +260,6 @@ class SalesTable extends React.Component {
         }
     }
 
-
-
-
     /**
      * This function grabs the data from the json after it has loaded.
      */
@@ -256,6 +277,9 @@ class SalesTable extends React.Component {
         return data;
     }
 
+    /**
+     * This function allows currency to be shown
+     */
     getCurrency(country) {
         switch (this.state.currency) {
             case "All":
@@ -269,14 +293,8 @@ class SalesTable extends React.Component {
                     default:
                         return "";
                 }
-            case "USD":
-                return "USD";
-            case "NZD":
-                return "NZD";
-            case "AUD":
-                return "AUD";
             default:
-                return "";
+                return this.state.currency;
         }
 
     }
@@ -301,18 +319,27 @@ class SalesTable extends React.Component {
         })
     }
 
+    /**
+     * Updates the text field
+     */
     handleFieldChange(value) {
         this.setState({
             text: value
         })
     }
 
+    /**
+     * Determines to show the menu
+     */
     handleReturnedOption() {
         this.setState({
             showReturn: !this.state.showReturn
         })
     }
 
+    /**
+     * Handles the current currency setting
+     */
     handleCurrency(value) {
         this.setState({
             currency: value

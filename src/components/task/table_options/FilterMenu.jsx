@@ -7,7 +7,6 @@ import {
     Select
 } from "@material-ui/core";
 
-
 /**
  * A component for displaying the options menu for the table
  * 
@@ -64,10 +63,15 @@ class FilterMenu extends React.Component {
         let copy = this.makeCopy(this.props.data)
         copy.forEach((x, i) => x.value = this.applyConversion(event.target.value, x))
         this.props.updateData(copy);
-
-
-
     }
+
+    /**
+     * Applies the currency conversion rate
+     * Currently it isn't very extendible as the switch case statement
+     * can get pretty hefty after more currencies.
+     * @param {*} currency 
+     * @param {*} data 
+     */
     applyConversion(currency, data) {
         let currencies = Object.keys(this.props.rates);
         currencies.push("All", "NZD");
@@ -119,9 +123,13 @@ class FilterMenu extends React.Component {
         if (this.props.text.length > 0) {
             newData = newData.filter(x => Object.values(x).map(y => y.toString().toLowerCase()).includes(this.props.text));
         }
+        this.props.changePage(0);
         this.props.updateData(newData);
     }
 
+    /**
+     * Makes a complete copy of an array but with a different reference.
+     */
     makeCopy(array) {
         let copy = [...array]
         let copyInside = copy.map((x, i) => x = JSON.parse(JSON.stringify(x)))
