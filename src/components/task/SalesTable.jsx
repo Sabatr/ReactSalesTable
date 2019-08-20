@@ -5,11 +5,13 @@ import {
     TableRow,
     TableBody,
     TableHead,
+    TablePagination,
     IconButton,
-    Card, CardContent, Typography, TableSortLabel
+    Card, CardContent, Typography, TableSortLabel, TableFooter
 } from "@material-ui/core";
+import importedData from '../data/data.js'
 import FilterMenu from './table_options/FilterMenu'
-
+import FooterActions from './table_options/FooterActions'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SearchField from "./SearchField";
 
@@ -38,7 +40,9 @@ class SalesTable extends React.Component {
             text: "",
             showReturn: false,
             sort: 'desc',
-            currency: "All"
+            currency: "All",
+            rowsPerPage: 5,
+            page: 0
         }
         this.handleOptionsClick = this.handleOptionsClick.bind(this);
         this.handleMenuClose = this.handleMenuClose.bind(this);
@@ -48,15 +52,24 @@ class SalesTable extends React.Component {
         this.makeCopy = this.makeCopy.bind(this);
         this.handleCurrency = this.handleCurrency.bind(this);
         this.handleSortClick = this.handleSortClick.bind(this);
+        this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this);
+        this.handleChangePage = this.handleChangePage.bind(this);
+        this.getEmptyRows = this.getEmptyRows.bind(this);
+        this.getFooter = this.getFooter.bind(this);
     }
 
 
-
     componentDidMount() {
-        fetch("http://www.mocky.io/v2/5d4caeb23100000a02a95477")
-            .then(response => response.json())
-            .then(response => this.setState({data:response }))
-            .then(this.makeCopy);
+        // fetch("http://www.mocky.io/v2/5d4caeb23100000a02a95477")
+        //     .then(response => response.json())
+        //     .then(response => this.setState({ data: response }))
+        //     .then(this.makeCopy);
+        console.log(importedData)
+        this.setState({
+            data: importedData,
+            originalData: importedData
+        })
+        //  console.log(data)
     }
 
     render() {
@@ -71,18 +84,18 @@ class SalesTable extends React.Component {
                     >
                         <MoreVertIcon />
                     </IconButton>
-                    <SearchField 
-                        data={this.state.data} 
-                        originalData={this.state.originalData} 
+                    <SearchField
+                        data={this.state.data}
+                        originalData={this.state.originalData}
                         updateTable={this.handleTableUpdate}
                         handleChange={this.handleFieldChange}
                         text={this.state.text}
-                        showReturned={this.state.showReturn}/>
+                        showReturned={this.state.showReturn} />
                     <FilterMenu
                         anchor={this.state.anchor}
                         onClose={this.handleMenuClose}
                         isOpen={this.state.isOpen}
-                        originalData={this.state.originalData} 
+                        originalData={this.state.originalData}
                         data={this.state.data}
                         updateData={this.handleTableUpdate}
                         handleReturned={this.handleReturnedOption}
@@ -91,7 +104,6 @@ class SalesTable extends React.Component {
                         rates={this.props.rates}
                         currencyHandler={this.handleCurrency}
                         currency={this.state.currency}
-
                     />
                     <Table>
                         <TableHead>
@@ -102,36 +114,93 @@ class SalesTable extends React.Component {
                                             direction={this.state.sort}
                                             onClick={() => this.handleSortClick(value)}
                                         >
-                                        { value }
+                                            {value}
                                         </TableSortLabel>
                                     </TableCell>)}
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {
-                                this.getData().map((data, i) =>
-                                    <TableRow key={`row_${i}`}>
-                                        {Object.values(data).map((tableData, inc) =>
-                                            <TableCell key={`cell_${inc}`}>
-                                                <div>
-                                                {
-                                                    (inc === 3) ? `${tableData} ${this.getCurrency(data.country)}`: `${tableData}`}
-                                                </div>
-                                            </TableCell>)}
-                                    </TableRow>)
+                                this.getData()
+                                    .slice(this.state.page * this.state.rowsPerPage, this.state.page * this.state.rowsPerPage + this.state.rowsPerPage)
+                                    .map((data, i) =>
+                                        <TableRow key={`row_${i}`}>
+                                            {Object.values(data).map((tableData, inc) =>
+                                                <TableCell key={`cell_${inc}`}>
+                                                    <div>
+                                                        {
+                                                            (inc === 3) ? `${tableData} ${this.getCurrency(data.country)}` : `${tableData}`}
+                                                    </div>
+                                                </TableCell>)}
+
+                                        </TableRow>)
+                            }
+                            {
+                                this.getEmptyRows() > 0 && (
+                                    <TableRow style={{ height: 48 * this.getEmptyRows() }}>
+                                        <TableCell colSpan={6} />
+                                    </TableRow>
+                                )
+
                             }
                         </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TablePagination
+                                    rowsPerPageOptions={[5, 10, 15,20,25]}
+                                    colSpan={6}
+                                    count={this.state.data.length}
+                                    rowsPerPage={this.state.rowsPerPage}
+                                    page={this.state.page}
+                                    SelectProps={{
+                                        inputProps: { 'aria-label': 'rows per page' },
+                                        native: true,
+                                    }}
+                                    onChangePage={this.handleChangePage}
+                                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                                    ActionsComponent={this.getFooter}
+
+                                />
+                            </TableRow>
+                        </TableFooter>
                     </Table>
                 </CardContent>
             </Card>
         );
     }
 
+    getFooter() {
+        return (
+            <FooterActions 
+                page={this.state.page} 
+                pageChange={this.handleChangePage}
+                count={this.state.data.length}
+                rowsPerPage={this.state.rowsPerPage}
+            />
+        )
+    }
+
+    getEmptyRows() {
+        let emptyRows = this.state.rowsPerPage - Math.min(this.state.rowsPerPage, this.state.data.length - this.state.page * this.state.rowsPerPage);
+        return emptyRows;
+    }
+
+    handleChangePage(pageNo) {
+        this.setState({
+            page: pageNo
+        })
+    }
+
+    handleChangeRowsPerPage(event) {
+        this.setState({
+            rowsPerPage: event.target.value
+        })
+    }
+
     makeCopy() {
-        
-        if ( this.state.data.length !== 0) {
+        if (this.state.data.length !== 0) {
             let data = [...this.state.data]
-            let copy = data.map((x,i) => x = JSON.parse(JSON.stringify(x)))
+            let copy = data.map((x, i) => x = JSON.parse(JSON.stringify(x)))
             this.setState({
                 originalData: copy
             })
@@ -159,15 +228,15 @@ class SalesTable extends React.Component {
         this.setState({
             sort: (this.state.sort === 'asc') ? 'desc' : 'asc'
         })
-        this.state.data.sort((x,y) => (typeof x[sortBy.toLowerCase()] === 'string') ?
-                `${x[sortBy.toLowerCase()]}`.localeCompare(`${y[sortBy.toLowerCase()]}`)
-            :     x[sortBy.toLowerCase()] - y[sortBy.toLowerCase()])
+        this.state.data.sort((x, y) => (typeof x[sortBy.toLowerCase()] === 'string') ?
+            `${x[sortBy.toLowerCase()]}`.localeCompare(`${y[sortBy.toLowerCase()]}`)
+            : x[sortBy.toLowerCase()] - y[sortBy.toLowerCase()])
         if (this.state.sort === 'desc') {
             this.state.data.reverse()
-        } 
+        }
     }
 
-    
+
 
 
     /**
@@ -190,7 +259,7 @@ class SalesTable extends React.Component {
     getCurrency(country) {
         switch (this.state.currency) {
             case "All":
-                switch(country) {
+                switch (country) {
                     case "USA":
                         return "USD";
                     case "NZL":
@@ -208,7 +277,7 @@ class SalesTable extends React.Component {
                 return "AUD";
             default:
                 return "";
-        } 
+        }
 
     }
 

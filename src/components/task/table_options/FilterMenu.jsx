@@ -43,11 +43,12 @@ class FilterMenu extends React.Component {
                     <Checkbox checked={this.props.checked} />
                     <Typography>Show returned only.</Typography>
                 </MenuItem>
-                <MenuItem >
+                <MenuItem>
                     <Select
                         native={true}
                         value={this.props.currency}
                         onChange={this.handleSelectChange}
+                        style={{width: '100%'}}
                     >
                         <option>All</option>
                         <option>NZD</option>
@@ -101,53 +102,6 @@ class FilterMenu extends React.Component {
         let returnedValue = (convert === 1) ?  original : Math.round(original/convert * 100)/100;
         return returnedValue;
     }
-    // applyConversion(value, currency, country,index,data) {
-    //     let convert = 1;
-    //     let currencies = Object.keys(this.props.rates);
-    //     currencies.push("All","NZD");
-    //     switch(currency) {
-    //         case "AUD":
-    //             if (country === "NZL") {
-    //                 convert = 1/this.props.rates.AUD;
-    //             } else if (country === "USA") {
-    //                 convert = this.props.rates.USD/this.props.rates.AUD;
-    //             } else {
-    //                 let original =  this.props.originalData.find(x=> x.id === data.id);
-    //                 value = original.value;
-    //             }
-    //             break;
-    //         case "USD":
-    //             if (country === "NZL") {
-    //                 convert = 1/this.props.rates.USD;
-    //             } else if (country === "AUS") {
-    //                 convert = this.props.rates.AUD/this.props.rates.USA
-    //             } else {
-    //                 //JSON.parse(JSON.stringify(data)) === JSON.parse(JSON.stringify(x))
-    //                 let original =  this.props.originalData.find(x=> x.id === data.id);
-    //                 value = original.value;
-    //                // value = this.props.originalData.find(x => JSON.parse  (JSON.stringify(x)))===JSON.parse(JSON.stringify(data));
-
-    //             }
-    //             break;
-    //         case "NZD":
-    //             if (country === "AUS") {
-    //                 convert = this.props.rates.AUD
-    //             } else if (country === "USA") {
-    //                 convert = this.props.rates.USD
-    //             } else {
-    //                 let original =  this.props.originalData.find(x=> x.id === data.id);
-    //                 value = original.value;
-    //             }
-    //             break;
-    //         default:
-    //         let original =  this.props.originalData.find(x=> x.id === data.id);
-    //         value = original.value;
-    //             convert = 1;
-    //             break;
-    //     }
-    //     let returnedValue = (convert === 1) ?  value : Math.round(value/convert * 100)/100;
-    //     return returnedValue;
-    // }
 
 
     /**

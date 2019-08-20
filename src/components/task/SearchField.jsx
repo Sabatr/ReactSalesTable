@@ -6,7 +6,8 @@ class SearchField extends React.Component {
         super(props);
 
         this.state = {
-            text: ""
+            text: "",
+            error: false
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -14,7 +15,13 @@ class SearchField extends React.Component {
     }
     render() {
         return (
-            <TextField onChange={this.handleChange} onKeyDown={this.handleSubmit}/>
+            <TextField style={{float: 'right'}} 
+            error={this.state.error} 
+            onChange={this.handleChange} 
+            onKeyDown={this.handleSubmit}
+            label="Search"
+            placeholder="NewEgg"
+            />
         );
     }
 
@@ -26,12 +33,22 @@ class SearchField extends React.Component {
         if(event.keyCode === 13) {
             let value = this.props.text.toLowerCase();
             let newData = this.props.originalData;
+            //console.log(value)
             let filter = newData.filter(x =>Object.values(x).map(y => y.toString().toLowerCase()).includes(value));
-            let filteredData =  (value.length === 0 || filter.length === 0) ? newData : filter; 
-            if (this.props.showReturned) {
-               filteredData =  filteredData.filter(x => x.returned === false)
+            if (filter.length === 0 && value !== "") {
+                this.setState({
+                    error: true
+                })
+            } else {
+                this.setState({
+                    error: false
+                })
+                let filteredData =  (value.length === 0 || filter.length === 0) ? newData : filter; 
+                if (this.props.showReturned) {
+                   filteredData =  filteredData.filter(x => x.returned === false)
+                }
+                this.props.updateTable(filteredData);
             }
-            this.props.updateTable(filteredData);
         }
     }
 }
