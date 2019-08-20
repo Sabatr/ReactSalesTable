@@ -125,12 +125,14 @@ class SalesTable extends React.Component {
                             <TableRow>
                                 {this.createHeadings().map((value, i) =>
                                     <TableCell key={`heading_${i}`}>
+                                        <Tooltip title={this.state.sort}>
                                         <TableSortLabel
                                             direction={this.state.sort}
                                             onClick={() => this.handleSortClick(value)}
                                         >
                                             {value}
                                         </TableSortLabel>
+                                        </Tooltip>
                                     </TableCell>)}
                             </TableRow>
                         </TableHead>
@@ -208,12 +210,18 @@ class SalesTable extends React.Component {
         return emptyRows;
     }
 
+    /**
+     * Handles the switching on pages
+     */
     handleChangePage(pageNo) {
         this.setState({
             page: pageNo
         })
     }
 
+    /**
+     * Handles the rows changing
+     */
     handleChangeRowsPerPage(event) {
         this.setState({
             rowsPerPage: parseInt(event.target.value)
@@ -248,6 +256,9 @@ class SalesTable extends React.Component {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
 
+    /**
+     * Sorts the data which depends on the column
+     */
     handleSortClick(sortBy) {
         this.setState({
             sort: (this.state.sort === 'asc') ? 'desc' : 'asc'

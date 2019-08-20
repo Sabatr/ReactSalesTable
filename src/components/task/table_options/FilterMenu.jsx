@@ -40,7 +40,7 @@ class FilterMenu extends React.Component {
             >
                 <MenuItem id="returned-menu-item" onClick={this.handleReturnedCheckChange}  >
                     <Checkbox checked={this.props.checked} />
-                    <Typography>Show returned only.</Typography>
+                    <Typography>Show not returned only.</Typography>
                 </MenuItem>
                 <MenuItem>
                     <Select

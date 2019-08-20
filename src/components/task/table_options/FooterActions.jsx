@@ -22,7 +22,7 @@ class FooterActions extends React.Component {
 
     render() {
         return (
-            <div className="" style={{width: '50%'}}>
+            <div className="" style={{width: '40%'}}>
                 <IconButton
                     onClick={this.handleFirstPageButtonClick}
                     disabled={this.props.page === 0}
