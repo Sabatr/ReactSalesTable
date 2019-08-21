@@ -26,7 +26,6 @@ class FilterMenu extends React.Component {
     render() {
         return (
             <Menu
-                id="long-menu"
                 anchorEl={this.props.anchor}
                 keepMounted={true}
                 open={this.props.isOpen}

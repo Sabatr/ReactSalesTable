@@ -55,6 +55,7 @@ class SearchField extends React.Component {
      */
     handleRemoveText() {
         this.props.handleChange("");
+        this.props.updateTable(this.props.originalData);
     }
 
     /**

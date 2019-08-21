@@ -13,11 +13,12 @@ import {
     Tooltip,
     TableSortLabel, TableFooter
 } from "@material-ui/core";
-import importedData from '../data/data.js'
+//import importedData from '../data/data.js' 
 import FilterMenu from './table_options/FilterMenu'
 import FooterActions from './table_options/FooterActions'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SearchField from "./SearchField";
+import CategoriseSelect from "./table_options/CategoriseSelect";
 
 /**
  * An implementation of a sales table using ReactJS and Material-UI
@@ -62,16 +63,16 @@ class SalesTable extends React.Component {
     }
 
     componentDidMount() {
-        // fetch("http://www.mocky.io/v2/5d4caeb23100000a02a95477")
-        //     .then(response => response.json())
-        //     .then(response => this.setState({ data: response }))
-        //     .then(this.makeCopy);
+        fetch("http://www.mocky.io/v2/5d4caeb23100000a02a95477")
+            .then(response => response.json())
+            .then(response => this.setState({ data: response }))
+            .then(this.makeCopy);
 
         // If I have no internet
-        this.setState({
-            data: importedData,
-            originalData: importedData
-        })
+        // this.setState({
+        //     data: importedData,
+        //     originalData: importedData
+        // })
     }
 
     render() {
@@ -135,6 +136,7 @@ class SalesTable extends React.Component {
                                         </Tooltip>
                                     </TableCell>)}
                             </TableRow>
+                            <CategoriseSelect anchor={this.state.anchor} data={this.state.data}/>
                         </TableHead>
                         <TableBody>
                             {
@@ -224,7 +226,8 @@ class SalesTable extends React.Component {
      */
     handleChangeRowsPerPage(event) {
         this.setState({
-            rowsPerPage: parseInt(event.target.value)
+            rowsPerPage: parseInt(event.target.value),
+            page: 0
         })
     }
 
