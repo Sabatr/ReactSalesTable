@@ -18,7 +18,6 @@ import FilterMenu from './table_options/FilterMenu'
 import FooterActions from './table_options/FooterActions'
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SearchField from "./SearchField";
-import CategoriseSelect from "./table_options/CategoriseSelect";
 
 /**
  * An implementation of a sales table using ReactJS and Material-UI
@@ -136,7 +135,6 @@ class SalesTable extends React.Component {
                                         </Tooltip>
                                     </TableCell>)}
                             </TableRow>
-                            <CategoriseSelect anchor={this.state.anchor} data={this.state.data}/>
                         </TableHead>
                         <TableBody>
                             {
